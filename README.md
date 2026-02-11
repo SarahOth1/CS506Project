@@ -7,9 +7,13 @@ The project will use the Top Fashion Company Financial Dataset from Kaggle, whic
 - Project timeline:
 
 Week 1: Data collection & Data cleaning
+
 Week 2:Feature extraction 
+
 Week 3-4: Data visualization
+
 Week 5-7: Model training
+
 Week 8: Writing Final Report
 
 - Project Goals:
@@ -19,6 +23,7 @@ Predict which clothing company is projected to achieve the highest gross revenue
 - Potential data sources:
 
 Top Fashion Company Financial dataset
+
 https://www.kaggle.com/datasets/toluwalopeosisiogu/top-fashion-company-financial-dataset
 
 - Data collection method:
