@@ -1,35 +1,38 @@
+
 # CS506Project
-- Project Topic Discription:
 
-We aim to predict which clothing company will become the highest grossing brand by the year 2030. By analyzing historical financial performance and industry trends, we will build a redictive model to forecast future revenue growth across major fashion companies.
-The project will use the Top Fashion Company Financial Dataset from Kaggle, which includes financial indicators such as revenue and revenue years. Data will be collected through scraping from Kaggle and then cleaned for analysis.
+## Project Topic Description
 
+We aim to predict what makes a movie successful by analyzing previous movie data including ratings, genre, runtime, and release year. By analyzing these factors, we will build a predictive model to forecast a movie's IMDb rating based on its characteristics. Data will be collected from IMDb's official free dataset downloads.
 
-- Project Timeline:
+## Project Timeline
 
-Week 1: Data collection & Data cleaning
+Week 1: Data collection from IMDb website and load datasets into Python using pandas
 
-Week 2: Feature extraction 
+Week 2: Data cleaning and processing (Merge files into one, remove duplicate movies, and handle missing column values)
 
-Week 3-4: Data visualization
+Week 3-4: Feature extraction (Select relevant features like genre, runtime, year)
 
-Week 5-7: Model training
+Week 5-6: Data visualization (Plot relevant features that could help with predicitoins and look for patterns)
 
-Week 8: Writing Final Report
+Week 7-8: Model training and evaluation (Using decision tree or linear regression for predicting the IMDb rating)
 
+Week 9: Writing Final Report
 
-- Project Goals:
+## Project Goals
 
-Predict which clothing company is projected to achieve the highest gross revenue by 2030 based on historical financial data.
+Successfully predict a movie's IMDb rating based on features such as genre,
+release year, runtime, and director. A clear goal is to identify which features
+most strongly predict a movie's rating and popularity.
 
+## Potential Data Sources
 
-- Potential Data Sources:
+IMDb Official Datasets :
+https://datasets.imdbws.com
+- title.basics.tsv.gz genre, runtime, release year
+- title.ratings.tsv.gz IMDb rating and number of votes
+- title.crew.tsv.gz directors and writers
 
-Top Fashion Company Financial dataset
+## Data Collection Method
 
-https://www.kaggle.com/datasets/toluwalopeosisiogu/top-fashion-company-financial-dataset
-
-
-- Data Collection Method:
-
-Scraping from Kaggle.com
+Direct free download from datasets.imdbws.com.
