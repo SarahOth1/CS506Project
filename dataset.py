@@ -81,6 +81,21 @@ df['numVotes'] = pd.to_numeric(df['numVotes'], errors='coerce')
 print("\nData types after conversion:")
 print(df.dtypes)
 
+
 # Save
 df.to_csv('movies_cleaned.csv', index=False)
 print("\nSaved!")
+
+# Step 10: Converting genre column into numeric representations (by adding each genre as a column)
+print(df['genres'].head(10)) 
+
+genres_dummies = df['genres'].str.get_dummies(sep=',')
+print("Genre columns created:", genres_dummies.columns.tolist())
+df = pd.concat([df, genres_dummies], axis=1)
+df = df.drop(columns=['genres'])
+print("Shape after encoding:", df.shape)
+print(df.columns.tolist())
+
+# Save
+df.to_csv('movies_cleaned.csv', index=False)
+print("Saved!")
