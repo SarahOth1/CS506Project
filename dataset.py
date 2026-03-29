@@ -43,6 +43,12 @@ df = df.replace('\\N', np.nan)
 # Step 4: Filter to movies only
 df = df[df['titleType'] == 'movie']
 
+# Step 7: Filter out movies with not enough votes to be relevant
+print("Shape before vote filter:", df.shape)
+df = df[df['numVotes'].astype(float) >= 1000]
+print("Shape after vote filter:", df.shape)
+
+
 # Step 5: Remove duplicate movie names
 print("Duplicates before:", df.duplicated().sum())
 print("Title duplicates:", df.duplicated(subset=['primaryTitle']).sum())
@@ -59,14 +65,6 @@ print('REMOVED IRRELEVANT COLUMNS. Updated columns:')
 # Confirm they are gone
 print(df.columns.tolist())
 
-# Save cleaned dataset
-df.to_csv('movies_cleaned.csv', index=False)
-print("Saved!")
-
-# Step 7: Filter out movies with not enough votes to be relevant
-print("Shape before vote filter:", df.shape)
-df = df[df['numVotes'] >= 1000]
-print("Shape after vote filter:", df.shape)
 
 # Step 8: Convert data types
 print("\nData types before conversion:")
@@ -81,10 +79,6 @@ df['numVotes'] = pd.to_numeric(df['numVotes'], errors='coerce')
 print("\nData types after conversion:")
 print(df.dtypes)
 
-
-# Save
-df.to_csv('movies_cleaned.csv', index=False)
-print("\nSaved!")
 
 # Step 10: Converting genre column into numeric representations (by adding each genre as a column)
 print(df['genres'].head(10)) 
