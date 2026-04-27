@@ -2,134 +2,136 @@
 
 import pandas as pd
 import numpy as np
-
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-# Load cleaned data
-df = pd.read_csv('movies_cleaned.csv')
 
-# Remove missing values
+# Load cleaned movie data
+df = pd.read_csv("movies_cleaned.csv")
+# drop rows missing important data
 df = df.dropna(subset=['startYear', 'runtimeMinutes', 'averageRating', 'numVotes'])
+# Load columns we will use from principals file
+princs = pd.read_csv(
+    "title.principals.tsv.gz",
+    sep="\t",
+    compression="gzip",
+    usecols=["tconst", "nconst", "category"]
+)
 
-# Model 1: Baseline model
+# Keep only useful people categories
+princs = princs[princs["category"].isin(["actor", "actress", "director", "writer"])]
+# Keep movies that are in the movie dataset
+princs = princs[princs["tconst"].isin(df["tconst"])]
 
-# These are the basic features before adding principals
-drop_cols = ['averageRating', 'tconst', 'primaryTitle']
-
-# Principal columns created later
-principal_cols = [
-    'num_principals',
-    'actor',
-    'actress',
-    'archive_footage',
-    'archive_sound',
-    'cinematographer',
-    'composer',
-    'director',
-    'editor',
-    'producer',
-    'production_designer',
-    'self',
-    'writer'
-]
-
-# Keeping principal columns that exist in downloaded file
-principal_cols = [col for col in principal_cols if col in df.columns]
-
-# Baseline drops principal columns
-X_baseline = df.drop(columns=drop_cols + principal_cols)
-y = df['averageRating']
-
-# confirming everything is numeric
-X_baseline = X_baseline.apply(pd.to_numeric, errors='coerce')
-X_baseline = X_baseline.fillna(0)
-
-# Splitting baseline data
-X_train_b, X_test_b, y_train_b, y_test_b = train_test_split(
-    X_baseline,
-    y,
+# Split data into training and testing
+train_df, test_df = train_test_split(
+    df,
     test_size=0.2,
     random_state=42
 )
 
-# Training on linear regression
-baseline_model = LinearRegression()
-baseline_model.fit(X_train_b, y_train_b)
+global_train_mean = train_df["averageRating"].mean()
 
-# Predicting
-y_pred_b = baseline_model.predict(X_test_b)
+# Function to add person average features
 
-# Evaluating using rmse
-baseline_rmse = np.sqrt(mean_squared_error(y_test_b, y_pred_b))
-baseline_mae = mean_absolute_error(y_test_b, y_pred_b)
-baseline_r2 = r2_score(y_test_b, y_pred_b)
+def add_person_avg_features(train_df, test_df, princs, category):
+    feature_name = category + "_avg_rating"
 
-print("BASELINE MODEL RESULTS")
-print("RMSE:", round(baseline_rmse, 4))
-print("MAE:", round(baseline_mae, 4))
-print("R2:", round(baseline_r2, 4))
+    # Get ratings from training movies
+    train_ratings = train_df[["tconst", "averageRating"]]
+
+    # Merge principals with training ratings
+    train_people = princs.merge(train_ratings, on="tconst", how="inner")
+
+    # Keep only this category
+    train_people_cat = train_people[train_people["category"] == category]
+
+    # Average rating for each person based on training data
+    person_avg = train_people_cat.groupby("nconst")["averageRating"].mean()
+
+    # For all movies, map each person to their average
+    all_people_cat = princs[princs["category"] == category].copy()
+    all_people_cat["person_avg"] = all_people_cat["nconst"].map(person_avg)
+
+    # Average the people averages per movie
+    movie_person_avg = all_people_cat.groupby("tconst")["person_avg"].mean()
+
+    # Add new feature to train and test
+    train_df[feature_name] = train_df["tconst"].map(movie_person_avg)
+    test_df[feature_name] = test_df["tconst"].map(movie_person_avg)
+
+    # Fill unknown people with global training average
+    train_df[feature_name] = train_df[feature_name].fillna(global_train_mean)
+    test_df[feature_name] = test_df[feature_name].fillna(global_train_mean)
+
+    return train_df, test_df
 
 
-# Model 2: adding principals to features
+# Add new rating features for each person category
+
+for category in ["actor", "actress", "director", "writer"]:
+    train_df, test_df = add_person_avg_features(train_df, test_df, princs, category)
+
+print("New columns added:")
+print(["actor_avg_rating", "actress_avg_rating", "director_avg_rating", "writer_avg_rating"])
 
 
-X_full = df.drop(columns=drop_cols)
-y = df['averageRating']
+# Adding more features 
+# To sclae down numVotes:
+train_df["log_numVotes"] = np.log1p(train_df["numVotes"])
+test_df["log_numVotes"] = np.log1p(test_df["numVotes"])
+# To explore bigger relationship between runtimeMinutes and avgRating
+train_df["runtime_sq"] = train_df["runtimeMinutes"] ** 2
+test_df["runtime_sq"] = test_df["runtimeMinutes"] ** 2
 
-# confirming  everything is numeric
-X_full = X_full.apply(pd.to_numeric, errors='coerce')
-X_full = X_full.fillna(0)
+#dropping original unedited cols
+drop_cols = ["averageRating", "tconst", "primaryTitle", "numVotes"]
 
-# Splitting data
-X_train_f, X_test_f, y_train_f, y_test_f = train_test_split(
-    X_full,
-    y,
-    test_size=0.2,
-    random_state=42
+X_train = train_df.drop(columns=drop_cols)
+y_train = train_df["averageRating"]
+
+X_test = test_df.drop(columns=drop_cols)
+y_test = test_df["averageRating"]
+
+# confirming features are numeric
+X_train = X_train.apply(pd.to_numeric, errors="coerce").fillna(0)
+X_test = X_test.apply(pd.to_numeric, errors="coerce").fillna(0)
+
+
+# Linear Regression Model
+
+linear_model = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", LinearRegression())
+])
+
+# function for evaluation
+
+def evaluate_model(model, name):
+    model.fit(X_train, y_train)
+    preds = model.predict(X_test)
+
+    rmse = np.sqrt(mean_squared_error(y_test, preds))
+    mae = mean_absolute_error(y_test, preds)
+    r2 = r2_score(y_test, preds)
+
+    print("\n" + name)
+    print("RMSE:", round(rmse, 4))
+    print("MAE:", round(mae, 4))
+    print("R2:", round(r2, 4))
+
+    return preds, rmse, mae, r2
+
+linear_preds, linear_rmse, linear_mae, linear_r2 = evaluate_model(
+    linear_model,
+    "Linear Regression with Historical Person Features"
 )
 
-# Training on linear regression
-full_model = LinearRegression()
-full_model.fit(X_train_f, y_train_f)
 
-# Predictting
-y_pred_f = full_model.predict(X_test_f)
-
-# Evaluating
-full_rmse = np.sqrt(mean_squared_error(y_test_f, y_pred_f))
-full_mae = mean_absolute_error(y_test_f, y_pred_f)
-full_r2 = r2_score(y_test_f, y_pred_f)
-
-print("\nIMPROVED MODEL WITH PRINCIPALS RESULTS")
-print("RMSE:", round(full_rmse, 4))
-print("MAE:", round(full_mae, 4))
-print("R2:", round(full_r2, 4))
-
-
-# Comparing results
-
-results = pd.DataFrame({
-    'Model': ['Baseline', 'With Principals'],
-    'RMSE': [baseline_rmse, full_rmse],
-    'MAE': [baseline_mae, full_mae],
-    'R2': [baseline_r2, full_r2]
-})
-
-print("\nMODEL COMPARISON")
-print(results.round(4))
-
-
-# Show subset of predictions
-
-
-comparison = pd.DataFrame({
-    'Actual Rating': y_test_f.values[:10],
-    'Predicted Rating': y_pred_f[:10].round(2)
-})
-
-print("\nSAMPLE PREDICTIONS FROM IMPROVED MODEL")
-print(comparison)
-
-
+plot_df=X_test.copy()
+plot_df["actual_rating"]=y_test.values
+plot_df["predicted_rating"]=linear_preds
+plot_df.to_csv("plotting_data.csv", index=False)

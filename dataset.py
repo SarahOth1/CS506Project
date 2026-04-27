@@ -31,7 +31,7 @@ print(princs.shape)
 # Count total number of main credited people per movie
 num_principals = princs.groupby('tconst').size().reset_index(name='num_principals')
 
-# Count each type of principal per movie, such as actor, actress, director, writer
+# Count each type of principal per movie (actor, actress, director, writer)
 category_counts = pd.crosstab(princs['tconst'], princs['category']).reset_index()
 
 # Merge principal features together
@@ -45,7 +45,7 @@ principal_features = pd.merge(
 print("Principal feature columns:")
 print(principal_features.columns.tolist())
 
-# Merge basics + ratings
+# Merge basics and ratings
 df = pd.merge(basics, ratings, on='tconst', how='inner')
 
 # Merge summarized principal_features
@@ -60,7 +60,7 @@ print(df.columns.tolist())
 # Filter to movies only
 df = df[df['titleType'] == 'movie']
 
-# Replace missing vaules with NaN
+# Replace missing vaules 
 df = df.replace('\\N', np.nan)
 
 # Convert columns to correct types
