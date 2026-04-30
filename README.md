@@ -156,6 +156,9 @@ Model | RMSE | MAE | R2 |
 
 Adding principal count features improved our model's performance.
 
+These are the predicted values plotted against the true values for the IMDb rating from the test set of the data:
+![Predicted Rating vs True Rating](predicted_vs_true.png)
+
 ## Visualizations
 
 The visualizations are created in `plottings.py`.
