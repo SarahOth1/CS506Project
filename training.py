@@ -135,3 +135,36 @@ plot_df=X_test.copy()
 plot_df["actual_rating"]=y_test.values
 plot_df["predicted_rating"]=linear_preds
 plot_df.to_csv("plotting_data.csv", index=False)
+
+
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Predict IMDb ratings for the test set
+y_pred = linear_model.predict(X_test)
+
+# Create dataframe with true and predicted values
+predictions_df = pd.DataFrame({
+    "true_rating": y_test,
+    "predicted_rating": y_pred
+})
+
+# Saving the values 
+predictions_df.to_csv("predicted_vs_true.csv", index=False)
+
+# Plotting predicted values against true values
+plt.figure(figsize=(8, 6))
+plt.scatter(predictions_df["true_rating"], predictions_df["predicted_rating"], alpha=0.5)
+
+
+min_rating = min(predictions_df["true_rating"].min(), predictions_df["predicted_rating"].min())
+max_rating = max(predictions_df["true_rating"].max(), predictions_df["predicted_rating"].max())
+plt.plot([min_rating, max_rating], [min_rating, max_rating], linestyle="--")
+
+plt.xlabel("True IMDb Rating")
+plt.ylabel("Predicted IMDb Rating")
+plt.title("Predicted vs True IMDb Ratings on Test Set")
+
+plt.tight_layout()
+plt.savefig("predicted_vs_true.png")
+plt.show()
