@@ -1,6 +1,11 @@
 
 ## **CS506Project**
 
+
+## Youtube Video Link
+
+https://youtu.be/7RUukmEDOIw
+
 ## Project Topic Description
 
 We aim to predict what makes a movie successful by analyzing previous movie data including ratings, genre, runtime, and release year. By analyzing these factors, we will build a predictive model to forecast a movie's IMDb rating based on its characteristics. Data will be collected from IMDb's official free dataset downloads.
