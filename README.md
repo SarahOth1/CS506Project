@@ -1,5 +1,5 @@
 
-**CS506Project**
+## **CS506Project**
 
 ## Project Topic Description
 
@@ -70,14 +70,14 @@ To run the full project, run `make run
 
 The data processing that happens in dataset.py:
 
-1- Loading the IMDb datasets.
-2- Merging title.basics.tsv.gz and title.ratings.tsv.gz using the movie ID column, tconst.
-3- Using title.principals.tsv.gz to create count features for each movie.
-4- Filtering the dataset to include only movies and replacing missing values with NaN.
-5- Converting columns types to numeric (startYear, runtimeMinutes, averageRating, and numVotes).
-6- Removing movies with less than 1000 votes so that the ratings are more reliable.
-7- Removing duplicate movie titles and keeping only the version with the highest number of votes.
-8- Converting the genres column into dummy variables (Action, Comedy, Drama, and Horror, etc)
+1. Loading the IMDb datasets.
+2. Merging title.basics.tsv.gz and title.ratings.tsv.gz using the movie ID column, tconst.
+3. Using title.principals.tsv.gz to create count features for each movie.
+4. Filtering the dataset to include only movies and replacing missing values with NaN.
+5. Converting columns types to numeric (startYear, runtimeMinutes, averageRating, and numVotes).
+6. Removing movies with less than 1000 votes so that the ratings are more reliable.
+7. Removing duplicate movie titles and keeping only the version with the highest number of votes.
+8. Converting the genres column into dummy variables (Action, Comedy, Drama, and Horror, etc)
 
 
 ## Features Used in the Model
@@ -86,9 +86,9 @@ The target variable is averageRating.
 
 The original IMDb features used are:
 
-**startYear**
-**runtimeMinutes**
-**numVotes**
+- **startYear**
+- **runtimeMinutes**
+- **numVotes**
 
 The principal count features created from title.principals.tsv.gz are:
 
@@ -102,25 +102,25 @@ writer (Count number of writers per movie)
 
 The genre dummy features created from the genres column include:
 
-**Action**
-**Adventure**
-**Animation**
-**Biography**
-**Comedy**
-**Crime**
-**Documentary**
-**Drama**
-**Family**
+- **Action**
+- **Adventure**
+- **Animation**
+- **Biography**
+- **Comedy**
+- **Crime**
+- **Documentary**
+- **Drama**
+- **Family**
 ... and so on
 
 Each genre column is coded as 1 if the movie belongs to that genre and 0 otherwise.
 
 The improved model (in the training.py file) also creates person-rating features across all rated movies:
 
-**actor_avg_rating**
-**actress_avg_rating**
-**director_avg_rating**
-**writer_avg_rating**
+- **actor_avg_rating**
+- **actress_avg_rating**
+- **director_avg_rating**
+- **writer_avg_rating**
 
 For each movie, the code looks at the actors, actresses, directors, and writers listed for that movie, it then calculates the average historical IMDb rating of those people based only on the training set.
 
