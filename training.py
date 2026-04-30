@@ -127,7 +127,7 @@ def evaluate_model(model, name):
 
 linear_preds, linear_rmse, linear_mae, linear_r2 = evaluate_model(
     linear_model,
-    "Linear Regression with Historical Person Features"
+    "Linear Regression with Person Features"
 )
 
 
